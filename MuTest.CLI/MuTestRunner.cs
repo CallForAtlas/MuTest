@@ -191,7 +191,7 @@ namespace MuTest.Console
                 {
                     builder.AppendLine("<fieldset style=\"margin-bottom:10; margin-top:10\">");
 
-                    builder.AppendLine($"{claz.TargetClass.ClassName} [{claz.TargetClass.ClassPath}]".PrintImportantWithLegend(color: Colors.BlueViolet));
+                    builder.AppendLine($"{claz.TargetClass.ClassName} [{claz.TargetClass.ClassPath}]".PrintImportantWithLegend(color: Colors.Blue));
                     builder.Append($"{claz.MutationScore.Mutation} - {claz.MutationScore}".PrintWithPreTagWithMarginImportant());
                     builder.Append($"Code Coverage - {claz.Coverage}".PrintWithPreTagWithMarginImportant());
 
@@ -202,7 +202,7 @@ namespace MuTest.Console
 
                 builder.AppendLine("<fieldset style=\"margin-bottom:10; margin-top:10\">");
                 builder.AppendLine("ProjectWise Summary".PrintImportantWithLegend());
-                builder.Append(projectSummary.MutationScore.ToString().PrintWithPreTagWithMarginImportant(color: Colors.BlueViolet));
+                builder.Append(projectSummary.MutationScore.ToString().PrintWithPreTagWithMarginImportant(color: Colors.Blue));
                 builder.Append($"Coverage: Mutation({projectSummary.MutationScore.Mutation}) {projectSummary.Coverage}".PrintWithPreTagWithMarginImportant(color: Colors.Blue));
                 builder.AppendLine("</fieldset>");
                 builder.AppendLine("</fieldset>");

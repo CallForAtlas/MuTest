@@ -133,7 +133,7 @@ namespace MuTest.Core.Common
                 if (method.Mutants.Any())
                 {
                     mutationProcessLog.AppendLine("<fieldset style=\"margin-bottom:10\">");
-                    mutationProcessLog.Append($"Method: {method.MethodName}".PrintImportantWithLegend(color: Colors.BlueViolet));
+                    mutationProcessLog.Append($"Method: {method.MethodName}".PrintImportantWithLegend(color: Colors.Orange));
                 }
 
                 foreach (var mutant in method.Mutants)
@@ -333,7 +333,7 @@ namespace MuTest.Core.Common
             {
                 method.CalculateMutationScore();
 
-                mutationProcessLog.Append(method.MutationScore.ToString().PrintWithPreTagWithMarginImportant(color: Colors.BlueViolet));
+                mutationProcessLog.Append(method.MutationScore.ToString().PrintWithPreTagWithMarginImportant(color: Colors.Blue));
                 mutationProcessLog.Append(
                     $"Method Coverage: Mutation({method.MutationScore.Mutation}) Line({method.LinesCovered}{method.LineCoverage}) Branch({method.BlocksCovered}{method.BranchCoverage})"
                         .PrintWithPreTagWithMarginImportant(color: Colors.Blue));
@@ -382,7 +382,7 @@ namespace MuTest.Core.Common
             _source.CalculateMutationScore();
             mutationProcessLog.AppendLine("<fieldset style=\"margin-bottom:10; margin-top:10\">");
             mutationProcessLog.AppendLine("ClassWise Summary".PrintImportantWithLegend());
-            mutationProcessLog.Append(_source.MutationScore.ToString().PrintWithPreTagWithMarginImportant(color: Colors.BlueViolet));
+            mutationProcessLog.Append(_source.MutationScore.ToString().PrintWithPreTagWithMarginImportant(color: Colors.Blue));
             mutationProcessLog.Append(
                 $"Coverage: Mutation({_source.MutationScore.Mutation}) Line({_source.LinesCovered}{_source.LineCoverage}) Branch({_source.BlocksCovered}{_source.BranchCoverage})"
                     .PrintWithPreTagWithMarginImportant(color: Colors.Blue));

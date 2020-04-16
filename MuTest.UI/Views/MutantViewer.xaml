@@ -349,7 +349,7 @@
                         <dxg:GridColumn Name="Name" FieldName="Name" ReadOnly="True">
                             <dxg:GridColumn.CellTemplate>
                                 <DataTemplate>
-                                    <RichTextBox viewModel:HtmlRichTextBoxBehavior.Text="{Binding Path=Value}" />
+                                    <RichTextBox Background="Transparent" viewModel:HtmlRichTextBoxBehavior.Text="{Binding Path=Value}" />
                                 </DataTemplate>
                             </dxg:GridColumn.CellTemplate>
                         </dxg:GridColumn>

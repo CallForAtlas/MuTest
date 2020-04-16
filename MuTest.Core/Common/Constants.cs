@@ -31,7 +31,7 @@ namespace MuTest.Core.Common
         public static readonly string TestsExecutionOutput = "Tests Execution Output";
         public static readonly string TestsExecutionResult = "Tests Results And Coverage";
         public static readonly string VerbosityOption = " -verbosity:";
-        public static readonly string DefaultColor = "#333";
+        public static readonly string DefaultColor = "#f1f1f1";
         public static readonly string SourceCodeDllSetting = "SourceCodeDllSetting";
         public static readonly string TestCodeDllSetting = "TestCodeDllSetting";
         public static readonly string TestCodeProjectSetting = "TestProjectSetting";
@@ -49,7 +49,7 @@ namespace MuTest.Core.Common
         public static readonly string TestExecutionIsCompletedNotification = "Test Execution is Completed";
         public static readonly string DuplicateCodeWindow = "Duplicate Code";
         public static readonly string CodeInspectionReport = "Code Inspection Report";
-        public static readonly string HtmlTemplate = @"<html><body style=""background-color: transparent;"">";
+        public static readonly string HtmlTemplate = @"<html><body style=""background-color: #2d2d30;"">";
         public static readonly string SourceClassPlaceholder = "#source_class#";
         public static readonly string ParameterizedTemplate = @"
             if (CheckParameter(""{0}""))
@@ -105,13 +105,13 @@ namespace MuTest.Core.Common
 
         public static class Colors
         {
-            public static readonly string Red = nameof(Color.Red);
-            public static readonly string Blue = nameof(Color.Blue);
-            public static readonly string Green = nameof(Color.Green);
+            public static readonly string Red = nameof(Color.LightPink);
+            public static readonly string Blue = nameof(Color.Aqua);
+            public static readonly string Green = nameof(Color.GreenYellow);
             public static readonly string Gold = nameof(Color.Gold);
-            public static readonly string BlueViolet = nameof(Color.BlueViolet);
+            public static readonly string BlueViolet = nameof(Color.Violet);
             public static readonly string Brown = nameof(Color.Brown);
-            public static readonly string Orange = nameof(Color.Orange);
+            public static readonly string Orange = nameof(Color.Khaki);
         }
 
         public enum TestExecutionStatus

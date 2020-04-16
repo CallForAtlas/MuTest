@@ -269,7 +269,7 @@ namespace MuTest.Core.Common
         private void PrintClassCoverage(SourceClassDetail source, string coverageClassName)
         {
             Output += " ".PrintWithPreTag();
-            Output += "Class Coverage: ".PrintWithPreTagImportant(3, Colors.Green);
+            Output += "Class Coverage: ".PrintWithPreTagImportant(3, Colors.Gold);
             Output += $"Class Name: {coverageClassName} {source.Coverage.ToString().Print(color: Colors.BlueViolet)}".PrintWithPreTagImportant();
             Output += "Methods Coverage: ".PrintWithPreTagImportant();
         }
@@ -279,7 +279,7 @@ namespace MuTest.Core.Common
             if (source.ExternalCoveredClasses.Any())
             {
                 Output += " ".PrintWithPreTag();
-                Output += "External Coverage: ".PrintWithPreTagImportant(3, Colors.Red);
+                Output += "External Coverage: ".PrintWithPreTagImportant(3, Colors.Gold);
                 foreach (var clz in source.ExternalCoveredClasses)
                 {
                     Output += clz.ToString().PrintWithPreTagWithMarginImportant(color: Colors.BlueViolet);

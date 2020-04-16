@@ -621,7 +621,6 @@ namespace Dashboard.ViewModel
                 {
                     TestClassLookup.SelectedIndex = selected.Id;
                 }
-
                 TestClassLookup.Visibility = Visibility.Visible;
             }
         }

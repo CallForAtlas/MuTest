@@ -4,7 +4,7 @@ namespace MuTest.Core.Common
 {
     public static class HtmlHelper
     {
-        private const string DefaultColor = "#333";
+        private const string DefaultColor = "#f1f1f1";
 
         public static string PrintWithDateTime(this string input)
         {

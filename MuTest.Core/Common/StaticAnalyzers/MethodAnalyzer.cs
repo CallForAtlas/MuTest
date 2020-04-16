@@ -55,7 +55,7 @@ namespace MuTest.Core.Common.StaticAnalyzers
 
             var coverage = 1 - _totalNumberOfMissedMutants / _totalNumberOfMutants;
             methodBuilder.AppendLine(
-                $"Mutants Coverage (Total): [{_totalNumberOfMissedMutants} Missed/{_totalNumberOfMutants}]({coverage:P})".PrintWithPreTagImportant(color: Constants.Colors.Brown));
+                $"Mutants Coverage (Total): [{_totalNumberOfMissedMutants} Missed/{_totalNumberOfMutants}]({coverage:P})".PrintWithPreTagImportant(color: Constants.Colors.Gold));
 
             return methodBuilder;
         }

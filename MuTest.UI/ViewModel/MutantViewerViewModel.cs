@@ -717,7 +717,7 @@ namespace Dashboard.ViewModel
                             if (mutantMutation.ReplacementNode != null)
                             {
                                 var originalNode = mutantMutation.OriginalNode.ToString().Encode().Print(mutantFontSize, Colors.Green);
-                                var replacementNode = mutantMutation.ReplacementNode.ToString().Encode().Print(mutantFontSize, Colors.Red);
+                                var replacementNode = mutantMutation.ReplacementNode.ToString().Encode().Print(mutantFontSize, Colors.Blue);
                                 var mutantBody =
                                     $"{mutant.Id.ToString()} - Line: {mutant.Mutation.Location} - {mutantMutation.Type} - {originalNode} replace with {replacementNode} - {status}".Print(
                                         mutantFontSize);
@@ -741,7 +741,7 @@ namespace Dashboard.ViewModel
                             }
                             else
                             {
-                                var originalNode = mutantMutation.OriginalNode.ToString().Print(mutantFontSize, Colors.Red);
+                                var originalNode = mutantMutation.OriginalNode.ToString().Print(mutantFontSize, Colors.Green);
                                 var mutantBody = $"{mutantMutation.Type} - remove {originalNode} - {status}".Print(mutantFontSize);
                                 var mutantDetail = MutantsDetails.FirstOrDefault(x => x.Id == mutantId);
                                 if (mutantDetail != null)

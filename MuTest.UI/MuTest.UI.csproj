@@ -60,41 +60,32 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DevExpress.CodeParser.v17.1, Version=17.1.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\DevExpress.CodeParser.v17.1.dll</HintPath>
+    <Reference Include="DevExpress.Data.v18.1">
+      <HintPath>libs\DevExpress.Data.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Data.v17.1, Version=17.1.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\DevExpress.Data.v17.1.dll</HintPath>
+    <Reference Include="DevExpress.Mvvm.v18.1">
+      <HintPath>libs\DevExpress.Mvvm.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Mvvm.v17.1, Version=17.1.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\DevExpress.Mvvm.v17.1.dll</HintPath>
+    <Reference Include="DevExpress.Pdf.v18.1.Core">
+      <HintPath>libs\DevExpress.Pdf.v18.1.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Pdf.v17.1.Core, Version=17.1.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\DevExpress.Pdf.v17.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.Printing.v18.1.Core">
+      <HintPath>libs\DevExpress.Printing.v18.1.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Printing.v17.1.Core, Version=17.1.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\DevExpress.Printing.v17.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Core.v18.1">
+      <HintPath>libs\DevExpress.Xpf.Core.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Core.v17.1, Version=17.1.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\DevExpress.Xpf.Core.v17.1.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1">
+      <HintPath>libs\DevExpress.Xpf.Grid.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v17.1, Version=17.1.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\DevExpress.Xpf.Grid.v17.1.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1.Core">
+      <HintPath>libs\DevExpress.Xpf.Grid.v18.1.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v17.1.Core, Version=17.1.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\DevExpress.Xpf.Grid.v17.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Printing.v18.1">
+      <HintPath>libs\DevExpress.Xpf.Printing.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Themes.Office2016WhiteSE.v17.1, Version=17.1.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\DevExpress.Xpf.Themes.Office2016WhiteSE.v17.1.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Themes.VS2017Dark.v18.1">
+      <HintPath>libs\DevExpress.Xpf.Themes.VS2017Dark.v18.1.dll</HintPath>
     </Reference>
     <Reference Include="HtmlToXamlConverter, Version=1.0.5727.24510, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlToXamlConverter.1.0.5727.24510\lib\net45\HtmlToXamlConverter.dll</HintPath>
