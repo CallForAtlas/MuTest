@@ -48,19 +48,59 @@ namespace MuTest.Cpp.CLI.Options
         [JsonProperty("json-output")]
         public string JsonOutputPath { get; private set; }
 
-        [JsonIgnore]
-        public string OutputPath { get; set; }
-
         [JsonProperty("enable-diagnostics")]
         public bool EnableDiagnostics { get; set; }
+
+        [JsonProperty("source-header")]
+        public string SourceHeader { get; set; }
+
+        [JsonProperty("in-isolation")]
+        public bool InIsolation { get; set; }
+
+        [JsonIgnore]
+        public string OutputPath { get; set; }
 
         public void ValidateOptions()
         {
             ValidateRequiredParameters();
             ValidateTestProject();
             ValidateTestSolution();
+            ValidateSourceHeader();
             ConcurrentTestRunners = ValidateConcurrentTestRunners();
             SetOutputPath();
+        }
+
+        private void ValidateSourceHeader()
+        {
+            if (string.IsNullOrWhiteSpace(SourceHeader))
+            {
+                var sourceClass = new FileInfo(SourceClass);
+                var sourceClassExtension = Path.GetExtension(sourceClass.Name);
+
+                if (sourceClassExtension.Equals(".h", StringComparison.InvariantCultureIgnoreCase) ||
+                    sourceClassExtension.Equals(".hpp", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    SourceHeader = SourceClass;
+                    return;
+                }
+
+                var headerFile = new FileInfo($"{sourceClass.DirectoryName}\\{Path.GetFileNameWithoutExtension(sourceClass.Name)}.h");
+                var headerCppFile = new FileInfo($"{sourceClass.DirectoryName}\\{Path.GetFileNameWithoutExtension(sourceClass.Name)}.hpp");
+
+                if (headerFile.Exists)
+                {
+                    SourceHeader = headerFile.FullName;
+                    return;
+                }
+
+                if (headerCppFile.Exists)
+                {
+                    SourceHeader = headerCppFile.FullName;
+                    return;
+                }
+
+                throw new MuTestInputException(ErrorMessage, $"Unable to find Source header file. Valid options are {CliOptions.SourceHeader.ArgumentShortName}");
+            }
         }
 
         private void ValidateTestProject()

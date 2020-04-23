@@ -69,17 +69,17 @@ namespace MuTest.Cpp.CLI.Utility
 
         public static void ReplaceLine(this string originalFile, int lineNumber, string newLine, string destinationFolder)
         {
-            if (string.IsNullOrWhiteSpace(originalFile))
+            if (String.IsNullOrWhiteSpace(originalFile))
             {
                 throw new ArgumentNullException(nameof(originalFile));
             }
 
-            if (string.IsNullOrWhiteSpace(newLine))
+            if (String.IsNullOrWhiteSpace(newLine))
             {
                 throw new ArgumentNullException(nameof(newLine));
             }
 
-            if (string.IsNullOrWhiteSpace(destinationFolder))
+            if (String.IsNullOrWhiteSpace(destinationFolder))
             {
                 throw new ArgumentNullException(nameof(destinationFolder));
             }
@@ -103,6 +103,34 @@ namespace MuTest.Cpp.CLI.Utility
             }
 
             destinationFolder.WriteLines(lines);
+        }
+
+        public static void DeleteIfExists(this FileSystemInfo file)
+        {
+            if (file == null)
+            {
+                return;
+            }
+
+            if (file.Exists)
+            {
+                file.Delete();
+            }
+        }
+
+        public static void DeleteIfExists(this string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            var file = new FileInfo(path);
+
+            if (file.Exists)
+            {
+                file.Delete();
+            }
         }
 
         public static void UpdateCode(this string updatedSourceCode, string codeFile)
@@ -136,6 +164,40 @@ namespace MuTest.Cpp.CLI.Utility
                     Debug.WriteLine("File is inaccessible....Try again");
                 }
             }
+        }
+
+        public static void AddNameSpace(this string codeFile, int index)
+        {
+            if (codeFile == null)
+            {
+                throw new ArgumentNullException(nameof(codeFile));
+            }
+
+            var fileLines = new List<string>();
+            using (var reader = new StreamReader(codeFile))
+            {
+                string line;
+                var namespaceAdded = false;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Trim().StartsWith("#") ||
+                        line.Trim().StartsWith("//") ||
+                        String.IsNullOrWhiteSpace(line) || 
+                        namespaceAdded)
+                    {
+                        fileLines.Add(line);
+                        continue;
+                    }
+
+                    fileLines.Add($"namespace mutest_test_{index} {{ {Environment.NewLine}{Environment.NewLine}");
+                    fileLines.Add(line);
+                    namespaceAdded = true;
+                }
+
+                fileLines.Add("}");
+            }
+
+            codeFile.WriteLines(fileLines);
         }
 
         public static void UpdateTestProject(this string newProjectLocation, string originalClassName, string newClassName)

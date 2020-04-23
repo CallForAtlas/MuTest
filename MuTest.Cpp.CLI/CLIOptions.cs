@@ -33,7 +33,14 @@ namespace MuTest.Cpp.CLI
         {
             ArgumentName = "--src-class",
             ArgumentShortName = "-sc <sourceClass>",
-            ArgumentDescription = @"Used for matching the source code file references when finding the source code file to mutate. Example: ""<relative-path>\ExampleClass.cpp, ExampleClass.h, ExampleClass.hpp"""
+            ArgumentDescription = @"Used for matching the source code file references when finding the source code file to mutate. Example: ""<relative-path>\ExampleClass.cpp"""
+        };
+
+        public static readonly CliOption<string> SourceHeader = new CliOption<string>
+        {
+            ArgumentName = "--src-header",
+            ArgumentShortName = "-sh <header>",
+            ArgumentDescription = @"Used for matching the source code header file references when finding the source code file to mutate. Example: ""ExampleClass.h, ExampleClass.hpp"""
         };
 
         public static readonly CliOption<string> OutputPath = new CliOption<string>
@@ -92,6 +99,15 @@ namespace MuTest.Cpp.CLI
             ArgumentDescription = "Set threshold to stop mutation analysis if number of killed mutants cross specific threshold Example 0.7 means stop mutation if 70% mutants are killed -- Default is 1.0",
             DefaultValue = DefaultOptions.KilledThreshold,
             ValueType = CommandOptionType.SingleValue
+        };
+
+        public static readonly CliOption<bool> InIsolation = new CliOption<bool>
+        {
+            ArgumentName = "--in-isolation",
+            ArgumentShortName = "-i",
+            ArgumentDescription = "Runs mutants in isolated test projects and solutions instead of sharing one test project and solution. It might run slower",
+            DefaultValue = DefaultOptions.InIsolation,
+            ValueType = CommandOptionType.NoValue
         };
     }
 }

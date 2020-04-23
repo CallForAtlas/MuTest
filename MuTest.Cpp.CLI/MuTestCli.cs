@@ -31,6 +31,7 @@ namespace MuTest.Cpp.CLI
 
             var testSolution = CreateOption(app, CliOptions.TestSolution);
             var sourceClass = CreateOption(app, CliOptions.SourceClass);
+            var sourceHeader = CreateOption(app, CliOptions.SourceHeader);
 
             var testProject = CreateOption(app, CliOptions.TestProject);
             var testClass = CreateOption(app, CliOptions.TestClass);
@@ -38,6 +39,7 @@ namespace MuTest.Cpp.CLI
             var parallel = CreateOption(app, CliOptions.Parallel);
             var survivedThreshold = CreateOption(app, CliOptions.SurvivedThreshold);
             var killedThreshold = CreateOption(app, CliOptions.KilledThreshold);
+            var inIsolation = CreateOption(app, CliOptions.InIsolation);
             var diagnostic = CreateOption(app, CliOptions.EnableDiagnostics);
             var outputPath = CreateOption(app, CliOptions.OutputPath);
             var configuration = CreateOption(app, CliOptions.BuildConfiguration);
@@ -52,6 +54,7 @@ namespace MuTest.Cpp.CLI
                     Diagnostics = diagnostic,
                     TestSolution = testSolution,
                     SourceClass = sourceClass,
+                    SourceHeader = sourceHeader,
                     TestProject = testProject,
                     TestClass = testClass,
                     Parallel = parallel,
@@ -59,7 +62,8 @@ namespace MuTest.Cpp.CLI
                     Configuration = configuration,
                     Platform = platform,
                     SurvivedThreshold = survivedThreshold,
-                    KilledThreshold = killedThreshold
+                    KilledThreshold = killedThreshold,
+                    InIsolation = inIsolation
                 }.Build();
 
                 await RunMuTest(options);
