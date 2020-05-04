@@ -2,7 +2,7 @@
 
 namespace MuTest.Core.Common.Settings
 {
-    public class VSTestConsoleSettings : ConfigurationElement
+    public class MuTestSettings : ConfigurationElement
     {
         [ConfigurationProperty(nameof(VSTestConsolePath), IsRequired = true)]
         public string VSTestConsolePath
@@ -46,7 +46,7 @@ namespace MuTest.Core.Common.Settings
             set => value = (string)this[nameof(TestsResultDirectory)];
         }
 
-        [ConfigurationProperty(nameof(TestTimeout), DefaultValue = 20000, IsRequired = false)]
+        [ConfigurationProperty(nameof(TestTimeout), DefaultValue = 40000, IsRequired = false)]
         public int TestTimeout
         {
             get => (int)this[nameof(TestTimeout)];
@@ -205,6 +205,13 @@ namespace MuTest.Core.Common.Settings
         {
             get => (string)this[nameof(ServiceAddress)];
             set => value = (string)this[nameof(ServiceAddress)];
+        }
+
+        [ConfigurationProperty(nameof(OpenCppCoveragePath), DefaultValue = @"OpenCppCoverage\OpenCppCoverage.exe", IsRequired = false)]
+        public string OpenCppCoveragePath
+        {
+            get => (string)this[nameof(OpenCppCoveragePath)];
+            set => value = (string)this[nameof(OpenCppCoveragePath)];
         }
     }
 }

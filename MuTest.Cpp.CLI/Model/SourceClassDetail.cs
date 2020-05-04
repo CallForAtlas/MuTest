@@ -13,23 +13,42 @@ namespace MuTest.Cpp.CLI.Model
         [JsonProperty("mutation-score")]
         public MutationScore MutationScore { get; } = new MutationScore();
 
+        [JsonProperty("coverage")]
+        public Coverage Coverage { get; set; }
+
         [JsonProperty("execution-time")]
         public long ExecutionTime { get; set; }
 
-        [JsonProperty("source-class")]
-        public string SourceClass { get; set; }
-
-        [JsonProperty("source-header")]
-        public string SourceHeader { get; set; }
-
-        [JsonProperty("test-class")]
-        public string TestClass { get; set; }
-
-        [JsonProperty("test-project")]
-        public string TestProject { get; set; }
-
         [JsonProperty("mutants")]
         public List<CppMutant> Mutants { get; } = new List<CppMutant>();
+
+        [JsonIgnore]
+        public string SourceClass { get; set; }
+
+        [JsonIgnore]
+        public string SourceHeader { get; set; }
+
+        [JsonIgnore]
+        public string TestClass { get; set; }
+
+        [JsonIgnore]
+        public string TestProject { get; set; }
+
+        [JsonIgnore]
+        public IList<uint> CoveredLineNumbers { get; } = new List<uint>();
+
+        [JsonIgnore]
+        public bool CoverageExist => Coverage != null;
+
+        [JsonIgnore]
+        public string LinesCovered => CoverageExist
+            ? $"{Coverage.LinesCovered}/{Coverage.TotalLines}"
+            : string.Empty;
+
+        [JsonIgnore]
+        public string LineCoverage => CoverageExist
+            ? $"[{Coverage.LinesCoveredPercentage}]"
+            : "NA";
 
         [JsonIgnore]
         public IList<CppMutant> SurvivedMutants => Mutants.Where(x => x.ResultStatus == MutantStatus.Survived).ToList();
@@ -57,13 +76,16 @@ namespace MuTest.Cpp.CLI.Model
         [JsonIgnore]
         public IList<CppMutant> SkippedMutants => Mutants.Where(x => x.ResultStatus == MutantStatus.Skipped).ToList();
 
-        [JsonProperty("configuration")]
+        [JsonIgnore]
         public string Configuration { get; set; }
 
-        [JsonProperty("platform")]
+        [JsonIgnore]
+        public string Target { get; set; }
+
+        [JsonIgnore]
         public string Platform { get; set; }
 
-        [JsonProperty("test-solution")]
+        [JsonIgnore]
         public string TestSolution { get; set; }
 
         public void CalculateMutationScore()
@@ -90,11 +112,6 @@ namespace MuTest.Cpp.CLI.Model
             if (string.IsNullOrWhiteSpace(SourceClass))
             {
                 throw new ArgumentNullException(nameof(SourceClass));
-            }
-
-            if (string.IsNullOrWhiteSpace(SourceHeader))
-            {
-                throw new ArgumentNullException(nameof(SourceHeader));
             }
 
             if (string.IsNullOrWhiteSpace(TestProject))

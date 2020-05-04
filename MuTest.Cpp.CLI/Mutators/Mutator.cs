@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using MuTest.Core.Mutators;
@@ -17,6 +16,27 @@ namespace MuTest.Cpp.CLI.Mutators
         public virtual IList<CppMutant> ApplyMutations(CodeLine line)
         {
             var mutants = new List<CppMutant>();
+            var arrayTypes = new List<string>
+            {
+                "bool * ",
+                "double * ",
+                "float * ",
+                "int * ",
+                "long * ",
+                "long double * ",
+                "long int * ",
+                "long long int * ",
+                "short int * ",
+                "signed char * ",
+                "std::string * ",
+                "unsigned char * ",
+                "unsigned int * ",
+                "unsigned long int * ",
+                "unsigned long long int * ",
+                "unsigned short int *",
+                "wchar_t * ",
+                "char * "
+            };
 
             var mutatorKinds = KindsToMutate;
             foreach (var pattern in mutatorKinds.Keys)
@@ -28,8 +48,25 @@ namespace MuTest.Cpp.CLI.Mutators
                     {
                         continue;
                     }
-                    foreach (var replacement in mutatorKinds[pattern])
+
+                    if (pattern == "!" &&
+                        line.Line.Length > match.Index + 2 &&
+                        line.Line[match.Index + 1] == '=')
                     {
+                        continue;
+                    }
+
+                    if (pattern == " \\* " &&
+                        arrayTypes.Any(x => line.Line.StartsWith(x) && match.Index <= x.Length))
+                    {
+                        continue;
+                    }
+
+                    foreach (var replacementValue in mutatorKinds[pattern])
+                    {
+                        var matchLength = match.Length;
+                        var replacement = replacementValue;
+                        var patternLength = match.Index + matchLength;
                         var mutation = new CppMutation
                         {
                             LineNumber = line.LineNumber,
@@ -41,7 +78,15 @@ namespace MuTest.Cpp.CLI.Mutators
                                 {
                                     if (replacement == "RL")
                                     {
-                                        return " ; ";
+                                        if (line.Line.Length > patternLength &&
+                                            char.IsNumber(line.Line[patternLength]))
+                                        {
+                                            return " + 1 + ";
+                                        }
+
+                                        return line.StringLines.Any()
+                                            ? " + \"mutest\" + "
+                                            : " - ";
                                     }
 
                                     return replacement;
@@ -50,13 +95,6 @@ namespace MuTest.Cpp.CLI.Mutators
                                 return match.Value;
                             })
                         };
-
-
-                        if (replacement == "RL")
-                        {
-                            mutation.ReplacementNode = mutation.ReplacementNode.Substring(0, match.Index + match.Length);
-                        }
-
 
                         mutation.DisplayName = $"Line Number: {line.LineNumber} - Type: {MutatorType} - {mutation.OriginalNode} replace with {mutation.ReplacementNode}";
 

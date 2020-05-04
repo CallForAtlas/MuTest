@@ -37,7 +37,6 @@ namespace MuTest.Cpp.CLI.Mutants
 
             var orchestrator = new CppMutantOrchestrator(new List<IMutator>
             {
-                new AssignmentStatementMutator(),
                 new ArithmeticMutator(),
                 new EqualityMutator(),
                 new LogicalMutator()
@@ -80,7 +79,11 @@ namespace MuTest.Cpp.CLI.Mutants
                 "void",
                 "using",
                 "catch",
-                "namespace"
+                "namespace",
+                "typedef",
+                "static",
+                "static",
+                "class"
             };
 
             using (var reader = new StreamReader(sourceFile))
@@ -94,7 +97,8 @@ namespace MuTest.Cpp.CLI.Mutants
                     line = line.Trim();
 
                     if (string.IsNullOrWhiteSpace(line) ||
-                        skipList.Any(x => line.StartsWith(x)))
+                        skipList.Any(x => line.StartsWith(x)) ||
+                        line.EndsWith("):"))
                     {
                         continue;
                     }
@@ -106,7 +110,7 @@ namespace MuTest.Cpp.CLI.Mutants
 
                     if (line.EndsWith("*/"))
                     {
-                        insideCommentedCode = true;
+                        insideCommentedCode = false;
                         continue;
                     }
 

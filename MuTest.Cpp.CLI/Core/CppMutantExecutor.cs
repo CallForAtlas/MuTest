@@ -27,7 +27,7 @@ namespace MuTest.Cpp.CLI.Core
 
         private readonly CppClass _cpp;
         private readonly CppBuildContext _context;
-        private readonly VSTestConsoleSettings _settings;
+        private readonly MuTestSettings _settings;
 
         private string _testDiagnostics;
 
@@ -40,7 +40,7 @@ namespace MuTest.Cpp.CLI.Core
             MutantExecuted?.Invoke(this, args);
         }
 
-        public CppMutantExecutor(CppClass cpp, CppBuildContext context, VSTestConsoleSettings settings)
+        public CppMutantExecutor(CppClass cpp, CppBuildContext context, MuTestSettings settings)
         {
             _cpp = cpp ?? throw new ArgumentNullException(nameof(cpp));
             _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -75,7 +75,7 @@ namespace MuTest.Cpp.CLI.Core
                 var buildExecutor = new CppBuildExecutor(
                     _settings,
                     _context.TestSolution.FullName,
-                    Path.GetFileNameWithoutExtension(_cpp.TestProject))
+                    _cpp.Target)
                 {
                     EnableLogging = false,
                     Configuration = _cpp.Configuration,
@@ -104,8 +104,17 @@ namespace MuTest.Cpp.CLI.Core
                         destinationFile.AddNameSpace(testContext.Index);
                     }
 
+                    if (_context.EnableBuildOptimization)
+                    {
+                        _context.TestProject.FullName.OptimizeTestProject();
+                    }
+
+                    var buildLog = new StringBuilder();
+                    void BuildOutputDataReceived(object sender, string args) => buildLog.Append(args.PrintWithPreTag());
+                    buildExecutor.OutputDataReceived += BuildOutputDataReceived;
                     await buildExecutor.ExecuteBuild();
-                    SetBuildLog(buildExecutor);
+                    SetBuildLog(buildExecutor, buildLog.ToString());
+                    buildExecutor.OutputDataReceived -= BuildOutputDataReceived;
                 }
 
                 directoryIndex = -1;
@@ -136,26 +145,8 @@ namespace MuTest.Cpp.CLI.Core
                                 mutant.Mutation.LineNumber,
                                 mutant.Mutation.ReplacementNode,
                                 destinationFile);
-
-                            buildExecutor = new CppBuildExecutor(
-                                _settings,
-                                string.Format(_context.TestSolution.FullName, directoryIndex),
-                                Path.GetFileNameWithoutExtension(_cpp.TestProject))
-                            {
-                                EnableLogging = false,
-                                Configuration = _cpp.Configuration,
-                                Platform = _cpp.Platform,
-                                IntDir = string.Format(_context.IntDir, directoryIndex),
-                                OutDir = string.Format(_context.OutDir, directoryIndex),
-                                OutputPath = string.Format(_context.OutputPath, directoryIndex),
-                                IntermediateOutputPath = string.Format(_context.IntermediateOutputPath, directoryIndex)
-                            };
-
-                            await buildExecutor.ExecuteBuild();
-                            SetBuildLog(buildExecutor);
                         }
-
-                        if (buildExecutor.LastBuildStatus == Constants.BuildExecutionStatus.Failed)
+                        else if (buildExecutor.LastBuildStatus == Constants.BuildExecutionStatus.Failed)
                         {
                             mutant.ResultStatus = MutantStatus.BuildError;
                             OnMutantExecuted(new CppMutantEventArgs
@@ -178,29 +169,19 @@ namespace MuTest.Cpp.CLI.Core
                 }
 
                 await Task.WhenAll(testTasks);
+                _context.EnableBuildOptimization = false;
             }
 
-            PrintMutationReport(mutationProcessLog, mutants);
+            PrintMutationReport(mutationProcessLog, _cpp.Mutants);
         }
 
-        private void SetBuildLog(CppBuildExecutor buildExecutor)
+        private void SetBuildLog(CppBuildExecutor buildExecutor, string log)
         {
-            var log = new StringBuilder();
             _buildDiagnostics = string.Empty;
-            void OutputDataReceived(object sender, string args) => log.Append(args.PrintWithPreTag());
 
-            if (buildExecutor.LastBuildStatus == Constants.BuildExecutionStatus.Failed)
+            if (buildExecutor.LastBuildStatus == Constants.BuildExecutionStatus.Failed && EnableDiagnostics)
             {
-                if (EnableDiagnostics)
-                {
-                    log.AppendLine("<fieldset style=\"margin-bottom:10\">");
-                    buildExecutor.OutputDataReceived += OutputDataReceived;
-
-                    log.AppendLine("</fieldset>");
-                    _buildDiagnostics = log.ToString();
-                }
-
-                buildExecutor.OutputDataReceived -= OutputDataReceived;
+                _buildDiagnostics = log;
             }
         }
 
@@ -242,6 +223,48 @@ namespace MuTest.Cpp.CLI.Core
 
         private async Task ExecuteTests(CppMutant mutant, int index)
         {
+            if (_context.UseMultipleSolutions)
+            {
+                var buildExecutor = new CppBuildExecutor(
+                    _settings,
+                    string.Format(_context.TestSolution.FullName, index),
+                    _cpp.Target)
+                {
+                    EnableLogging = false,
+                    Configuration = _cpp.Configuration,
+                    Platform = _cpp.Platform,
+                    IntDir = string.Format(_context.IntDir, index),
+                    OutDir = string.Format(_context.OutDir, index),
+                    OutputPath = string.Format(_context.OutputPath, index),
+                    IntermediateOutputPath = string.Format(_context.IntermediateOutputPath, index)
+                };
+
+                if (_context.EnableBuildOptimization)
+                {
+                    string.Format(_context.TestProject.FullName, index).OptimizeTestProject();
+                }
+
+                var buildLog = new StringBuilder();
+                void BuildOutputDataReceived(object sender, string args) => buildLog.Append(args.PrintWithPreTag());
+                buildExecutor.OutputDataReceived += BuildOutputDataReceived;
+                await buildExecutor.ExecuteBuild();
+                SetBuildLog(buildExecutor, buildLog.ToString());
+                buildExecutor.OutputDataReceived -= BuildOutputDataReceived;
+
+                if (buildExecutor.LastBuildStatus == Constants.BuildExecutionStatus.Failed)
+                {
+                    mutant.ResultStatus = MutantStatus.BuildError;
+                    OnMutantExecuted(new CppMutantEventArgs
+                    {
+                        Mutant = mutant,
+                        TestLog = _testDiagnostics,
+                        BuildLog = _buildDiagnostics
+                    });
+
+                    return;
+                }
+            }
+
             var testExecutor = new GoogleTestExecutor
             {
                 KillProcessOnTestFail = true,
@@ -265,9 +288,17 @@ namespace MuTest.Cpp.CLI.Core
             var projectDirectory = Path.GetDirectoryName(_cpp.TestProject);
             var projectName = Path.GetFileNameWithoutExtension(_cpp.TestProject);
 
+            var projectNameFromTestContext = string.Format(Path.GetFileNameWithoutExtension(_context.TestProject.Name), index);
+            var app = $"{projectDirectory}/{string.Format(_context.OutDir, index)}{projectName}.exe";
+
+            if (!File.Exists(app))
+            {
+                app = $"{projectDirectory}/{string.Format(_context.OutDir, index)}{projectNameFromTestContext}.exe";
+            }
+
             await testExecutor.ExecuteTests(
-                $"{projectDirectory}/{string.Format(_context.OutDir, index)}{projectName}.exe",
-                $"{Path.GetFileNameWithoutExtension(_context.TestContexts[index].TestClass.Name)}.*");
+                app,
+                $"{Path.GetFileNameWithoutExtension(_context.TestContexts[index].TestClass.Name)}*");
 
             testExecutor.OutputDataReceived -= OutputDataReceived;
             if (EnableDiagnostics && testExecutor.LastTestExecutionStatus == Constants.TestExecutionStatus.Timeout)
@@ -332,7 +363,7 @@ namespace MuTest.Cpp.CLI.Core
             mutationProcessLog.AppendLine("ClassWise Summary".PrintImportantWithLegend());
             mutationProcessLog.Append(cppClass.MutationScore.ToString().PrintWithPreTagWithMarginImportant(color: Constants.Colors.BlueViolet));
             mutationProcessLog.Append(
-                $"Coverage: Mutation({cppClass.MutationScore.Mutation})"
+                $"Coverage: Mutation({cppClass.MutationScore.Mutation}) Line({cppClass.LinesCovered}{cppClass.LineCoverage})"
                     .PrintWithPreTagWithMarginImportant(color: Constants.Colors.Blue));
             mutationProcessLog.AppendLine("</fieldset>");
         }

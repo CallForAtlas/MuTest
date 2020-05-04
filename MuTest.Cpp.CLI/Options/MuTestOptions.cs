@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using MuTest.Core.Common;
 using MuTest.Core.Exceptions;
 using MuTest.Cpp.CLI.Utility;
@@ -12,14 +14,23 @@ namespace MuTest.Cpp.CLI.Options
         private const string ErrorMessage = "The value for one of your settings is not correct. Try correcting or removing them.";
         private const string JsonExtension = ".json";
         private const string HtmlExtension = ".html";
-        private const int DefaultConcurrentTestRunners = 4;
+        private const int DefaultConcurrentTestRunners = 5;
         private const double DefaultThreshold = 1.0;
+
+        [JsonProperty("source-class")]
+        public string SourceClass { get; set; }
+
+        [JsonProperty("source-header")]
+        public string SourceHeader { get; set; }
+
+        [JsonProperty("test-class")]
+        public string TestClass { get; set; }
 
         [JsonProperty("test-solution")]
         public string TestSolution { get; set; }
 
-        [JsonProperty("source-class")]
-        public string SourceClass { get; set; }
+        [JsonProperty("test-project")]
+        public string TestProject { get; set; }
 
         [JsonProperty("configuration")]
         public string Configuration { get; set; }
@@ -27,11 +38,14 @@ namespace MuTest.Cpp.CLI.Options
         [JsonProperty("platform")]
         public string Platform { get; set; }
 
-        [JsonProperty("test-project")]
-        public string TestProject { get; set; }
+        [JsonProperty("target")]
+        public string Target { get; set; }
 
-        [JsonProperty("test-class")]
-        public string TestClass { get; set; }
+        [JsonProperty("in-isolation")]
+        public bool InIsolation { get; set; }
+
+        [JsonProperty("enable-diagnostics")]
+        public bool EnableDiagnostics { get; set; }
 
         [JsonProperty("concurrent-test-runners")]
         public int ConcurrentTestRunners { get; set; } = DefaultConcurrentTestRunners;
@@ -48,14 +62,8 @@ namespace MuTest.Cpp.CLI.Options
         [JsonProperty("json-output")]
         public string JsonOutputPath { get; private set; }
 
-        [JsonProperty("enable-diagnostics")]
-        public bool EnableDiagnostics { get; set; }
-
-        [JsonProperty("source-header")]
-        public string SourceHeader { get; set; }
-
-        [JsonProperty("in-isolation")]
-        public bool InIsolation { get; set; }
+        [JsonProperty("disable-build-optimization")]
+        public bool DisableBuildOptimization { get; set; }
 
         [JsonIgnore]
         public string OutputPath { get; set; }
@@ -65,7 +73,12 @@ namespace MuTest.Cpp.CLI.Options
             ValidateRequiredParameters();
             ValidateTestProject();
             ValidateTestSolution();
-            ValidateSourceHeader();
+
+            if (!InIsolation)
+            {
+                ValidateSourceHeader();
+            }
+
             ConcurrentTestRunners = ValidateConcurrentTestRunners();
             SetOutputPath();
         }
@@ -122,13 +135,47 @@ namespace MuTest.Cpp.CLI.Options
 
         private void ValidateTestSolution()
         {
-            if (string.IsNullOrWhiteSpace(TestSolution))
+            if (string.IsNullOrWhiteSpace(TestSolution) || !File.Exists(TestSolution))
             {
-                var testSolution = new FileInfo(TestProject).FindCppSolutionFile();
+                var testSolution = new FileInfo(TestProject).FindCppSolutionFile(TestProject);
                 if (testSolution != null)
                 {
                     TestSolution = testSolution.FullName;
                 }
+            }
+
+            if (!string.IsNullOrWhiteSpace(TestSolution))
+            {
+                var testSolution = new FileInfo(TestSolution);
+                var projects = testSolution.FullName.GetProjects().ToList();
+                var project = projects.First(x => x.AbsolutePath != null &&
+                                              Path.GetFileName(x.AbsolutePath).Equals(Path.GetFileName(TestProject), StringComparison.InvariantCultureIgnoreCase));
+
+                var parentFolders = new List<string>();
+                var parentGuid = project.ParentProjectGuid;
+
+                while (parentGuid != null)
+                {
+                    var parentProject = projects.FirstOrDefault(x => x.ProjectGuid == parentGuid);
+                    if (parentProject == null)
+                    {
+                        break;
+                    }
+
+                    parentFolders.Add(parentProject.ProjectName);
+                    parentGuid = parentProject.ParentProjectGuid;
+                }
+
+                var target = string.Empty;
+                for (var index = parentFolders.Count - 1; index >= 0 ; index--)
+                {
+                    target = string.Join("\\", target, parentFolders[index]);
+                }
+
+                target = $"{target.Trim('\\')}\\{project.ProjectName}".Trim('\\');
+                Target = target;
+
+                return;
             }
 
             if (!File.Exists(TestSolution))

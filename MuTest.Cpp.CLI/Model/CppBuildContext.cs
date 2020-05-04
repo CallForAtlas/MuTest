@@ -20,5 +20,9 @@ namespace MuTest.Cpp.CLI.Model
         public IList<CppTestContext> TestContexts { get; } = new List<CppTestContext>();
 
         public bool UseMultipleSolutions { get; set; }
+
+        public bool NamespaceAdded { get; set; }
+
+        public bool EnableBuildOptimization { get; set; }
     }
 }

@@ -99,6 +99,7 @@ namespace MuTest.Cpp.CLI.Core
                         sourceCode.UpdateCode(newSourceClassLocation);
                         new FileInfo(cppClass.SourceHeader).CopyTo(newHeaderClassLocation, true);
 
+                        context.NamespaceAdded = true;
                         newHeaderClassLocation.AddNameSpace(index);
                         newSourceClassLocation.AddNameSpace(index);
                     }
@@ -110,7 +111,14 @@ namespace MuTest.Cpp.CLI.Core
                     testCode.UpdateCode(newTestClassLocation);
                     testContext.TestClass = new FileInfo(newTestClassLocation);
 
-                    AddNameSpaceWithSourceReference(newTestClassLocation, testContext, index);
+                    if (!testCode.Contains(testContext.SourceClass.Name))
+                    {
+                        AddNameSpaceWithSourceReference(newTestClassLocation, testContext, index);
+                    }
+                    else
+                    {
+                        newTestClassLocation.AddNameSpace(index);
+                    }
 
                     var relativeTestCodePath = cppClass.TestClass.RelativePath(projectDirectory);
                     var relativeNewTestCodePath = newTestClassLocation.RelativePath(projectDirectory);
@@ -196,7 +204,8 @@ namespace MuTest.Cpp.CLI.Core
                     var relativeTestCodePath = cppClass.TestClass.RelativePath(projectDirectory);
                     var relativeNewTestCodePath = newTestClassLocation.RelativePath(projectDirectory);
 
-                    var projectXml = project.Replace(relativeTestCodePath, relativeNewTestCodePath);
+                    var projectXml = project.Replace(relativeTestCodePath, relativeNewTestCodePath)
+                        .Replace($"{sourceClassName}{sourceClassExtension}", newSourceClass);
                     projectXml.UpdateCode(string.Format(newTestProjectLocation, index));
 
                     newSourceClassLocation.DeleteIfExists();
@@ -211,7 +220,11 @@ namespace MuTest.Cpp.CLI.Core
 
                     testCode.UpdateCode(newTestClassLocation);
                     testContext.TestClass = new FileInfo(newTestClassLocation);
-                    AddSourceReference(testContext);
+
+                    if (!testCode.Contains(testContext.SourceClass.Name) && !project.Contains($"{sourceClassName}{sourceClassExtension}"))
+                    {
+                        AddSourceReference(testContext);
+                    }
 
                     context.TestContexts.Add(testContext);
                 }

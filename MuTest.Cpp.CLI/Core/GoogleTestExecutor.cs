@@ -13,11 +13,12 @@ namespace MuTest.Cpp.CLI.Core
         private Process _currentProcess;
         private Timer _timer;
         private const string TestCaseFilter = " --gtest_filter=";
+        private const string ShuffleTests = " --gtest_shuffle";
         private const string FailedDuringExecution = "[  FAILED  ]";
 
         public bool KillProcessOnTestFail { get; set; } = false;
 
-        public double TestTimeout { get; set; } = 15000;
+        public double TestTimeout { get; set; } = 40000;
 
         public bool EnableTestTimeout { get; set; }
 
@@ -41,7 +42,7 @@ namespace MuTest.Cpp.CLI.Core
 
             LastTestExecutionStatus = TestExecutionStatus.Success;
             TestResult = null;
-            var methodBuilder = new StringBuilder();
+            var methodBuilder = new StringBuilder(ShuffleTests);
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
@@ -78,7 +79,9 @@ namespace MuTest.Cpp.CLI.Core
                     if (LastTestExecutionStatus != TestExecutionStatus.Failed && 
                         LastTestExecutionStatus != TestExecutionStatus.Timeout)
                     {
-                        LastTestExecutionStatus = TestStatusList[_currentProcess.ExitCode];
+                        LastTestExecutionStatus = TestStatusList.ContainsKey(_currentProcess.ExitCode)
+                            ? TestStatusList[_currentProcess.ExitCode]
+                            : TestExecutionStatus.Timeout;
                     }
 
                     _currentProcess.OutputDataReceived -= CurrentProcessOnOutputDataReceived;
