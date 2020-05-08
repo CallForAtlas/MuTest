@@ -49,6 +49,11 @@ namespace MuTest.Cpp.CLI.Mutators
                         continue;
                     }
 
+                    if (line.CommentLines.Any(x => match.Index > x.Start && match.Index < x.End))
+                    {
+                        continue;
+                    }
+
                     if (pattern == "!" &&
                         line.Line.Length > match.Index + 2 &&
                         line.Line[match.Index + 1] == '=')
@@ -96,7 +101,7 @@ namespace MuTest.Cpp.CLI.Mutators
                             })
                         };
 
-                        mutation.DisplayName = $"Line Number: {line.LineNumber} - Type: {MutatorType} - {mutation.OriginalNode} replace with {mutation.ReplacementNode}";
+                        mutation.DisplayName = $"Type: {MutatorType} - {mutation.OriginalNode} replace with {mutation.ReplacementNode}";
 
                         mutants.Add(new CppMutant
                         {

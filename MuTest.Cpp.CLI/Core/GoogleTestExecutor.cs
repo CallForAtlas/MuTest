@@ -15,10 +15,11 @@ namespace MuTest.Cpp.CLI.Core
         private const string TestCaseFilter = " --gtest_filter=";
         private const string ShuffleTests = " --gtest_shuffle";
         private const string FailedDuringExecution = "[  FAILED  ]";
+        private static readonly object OutputDataReceivedLock = new object();
 
         public bool KillProcessOnTestFail { get; set; } = false;
 
-        public double TestTimeout { get; set; } = 40000;
+        public double TestTimeout { get; set; } = 15000;
 
         public bool EnableTestTimeout { get; set; }
 
@@ -37,7 +38,8 @@ namespace MuTest.Cpp.CLI.Core
         {
             _timer = new Timer
             {
-                Interval = TestTimeout
+                Interval = TestTimeout,
+                AutoReset = false
             };
 
             LastTestExecutionStatus = TestExecutionStatus.Success;
@@ -54,9 +56,11 @@ namespace MuTest.Cpp.CLI.Core
             {
                 Arguments = methodBuilder.ToString(),
                 UseShellExecute = false,
+                ErrorDialog = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
-                RedirectStandardError = true
+                RedirectStandardError = true,
+                WindowStyle = ProcessWindowStyle.Hidden
             };
 
             await Task.Run(() =>
@@ -67,22 +71,29 @@ namespace MuTest.Cpp.CLI.Core
                     EnableRaisingEvents = true
                 })
                 {
-                    _timer.Elapsed += TimerOnElapsed;
-                    _timer.Enabled = true;
                     _currentProcess.OutputDataReceived += CurrentProcessOnOutputDataReceived;
                     _currentProcess.ErrorDataReceived += CurrentProcessOnOutputDataReceived;
                     _currentProcess.Start();
                     _currentProcess.BeginOutputReadLine();
                     _currentProcess.BeginErrorReadLine();
+                    if (EnableTestTimeout)
+                    {
+                        _timer.Elapsed += TimerOnElapsed;
+                        _timer.Enabled = true;
+                    }
+
                     _currentProcess.WaitForExit();
 
-                    if (LastTestExecutionStatus != TestExecutionStatus.Failed && 
+                    if (LastTestExecutionStatus != TestExecutionStatus.Failed &&
                         LastTestExecutionStatus != TestExecutionStatus.Timeout)
                     {
                         LastTestExecutionStatus = TestStatusList.ContainsKey(_currentProcess.ExitCode)
                             ? TestStatusList[_currentProcess.ExitCode]
-                            : TestExecutionStatus.Timeout;
+                            : _currentProcess.ExitCode < 0
+                                ? TestExecutionStatus.Failed
+                                : TestExecutionStatus.Timeout;
                     }
+
 
                     _currentProcess.OutputDataReceived -= CurrentProcessOnOutputDataReceived;
                     _currentProcess.ErrorDataReceived -= CurrentProcessOnOutputDataReceived;
@@ -93,40 +104,44 @@ namespace MuTest.Cpp.CLI.Core
         private void TimerOnElapsed(object sender, ElapsedEventArgs e)
         {
             LastTestExecutionStatus = TestExecutionStatus.Timeout;
-
-            if (_currentProcess != null && !_currentProcess.HasExited)
-            {
-                _currentProcess.Kill();
-            }
-
+            KillProcess(_currentProcess);
             _timer.Dispose();
         }
 
         private void CurrentProcessOnOutputDataReceived(object sender, DataReceivedEventArgs args)
         {
-            if (EnableTestTimeout)
+            lock (OutputDataReceivedLock)
             {
-                _timer.Elapsed -= TimerOnElapsed;
-                _timer?.Dispose();
-                _timer = new Timer(TestTimeout)
+                if (EnableTestTimeout)
                 {
-                    Enabled = true
-                };
-                _timer.Elapsed += TimerOnElapsed;
-            }
-
-            OnThresholdReached(args);
-
-            if (KillProcessOnTestFail && args.Data != null &&
-                args.Data.StartsWith(FailedDuringExecution))
-            {
-                LastTestExecutionStatus = TestExecutionStatus.Failed;
-
-                var process = (Process)sender;
-                if (process != null && !process.HasExited)
-                {
-                    process.Kill();
+                    _timer.Stop();
+                    _timer.Enabled = false;
+                    _timer.Elapsed -= TimerOnElapsed;
+                    _timer.Close();
+                    _timer = new Timer(TestTimeout)
+                    {
+                        Enabled = true,
+                        AutoReset = false
+                    };
+                    _timer.Elapsed += TimerOnElapsed;
                 }
+
+                OnThresholdReached(args);
+
+                if (KillProcessOnTestFail && args.Data != null &&
+                    args.Data.StartsWith(FailedDuringExecution))
+                {
+                    LastTestExecutionStatus = TestExecutionStatus.Failed;
+                    KillProcess((Process)sender);
+                }
+            }
+        }
+
+        private static void KillProcess(Process process)
+        {
+            if (process != null && !process.HasExited)
+            {
+                process.Kill();
             }
         }
     }
