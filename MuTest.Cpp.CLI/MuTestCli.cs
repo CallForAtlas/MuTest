@@ -31,6 +31,7 @@ namespace MuTest.Cpp.CLI
 
             var testSolution = CreateOption(app, CliOptions.TestSolution);
             var sourceClass = CreateOption(app, CliOptions.SourceClass);
+            var specificLines = CreateOption(app, CliOptions.SpecificLineRange);
             var sourceHeader = CreateOption(app, CliOptions.SourceHeader);
 
             var testProject = CreateOption(app, CliOptions.TestProject);
@@ -41,6 +42,7 @@ namespace MuTest.Cpp.CLI
             var killedThreshold = CreateOption(app, CliOptions.KilledThreshold);
             var inIsolation = CreateOption(app, CliOptions.InIsolation);
             var disableBuildOptimization = CreateOption(app, CliOptions.DisableBuildOptimization);
+            var includeBuildEvents = CreateOption(app, CliOptions.IncludeBuildEvents);
             var diagnostic = CreateOption(app, CliOptions.EnableDiagnostics);
             var outputPath = CreateOption(app, CliOptions.OutputPath);
             var configuration = CreateOption(app, CliOptions.BuildConfiguration);
@@ -65,7 +67,9 @@ namespace MuTest.Cpp.CLI
                     SurvivedThreshold = survivedThreshold,
                     KilledThreshold = killedThreshold,
                     InIsolation = inIsolation,
-                    DisableBuildOptimization = disableBuildOptimization
+                    SpecificLines = specificLines,
+                    DisableBuildOptimization = disableBuildOptimization,
+                    IncludeBuildEvents = includeBuildEvents
                 }.Build();
 
                 await RunMuTest(options);

@@ -14,6 +14,7 @@ using MuTest.Cpp.CLI.Core;
 using MuTest.Cpp.CLI.Model;
 using MuTest.Cpp.CLI.Mutants;
 using MuTest.Cpp.CLI.Options;
+using MuTest.Cpp.CLI.Utility;
 using Newtonsoft.Json;
 using static MuTest.Core.Common.Constants;
 
@@ -62,9 +63,9 @@ namespace MuTest.Cpp.CLI
                     TestProject = _options.TestProject,
                     Target = _options.Target,
                     SourceHeader = _options.SourceHeader,
-                    TestSolution = _options.TestSolution
+                    TestSolution = _options.TestSolution,
+                    IncludeBuildEvents = _options.IncludeBuildEvents
                 };
-
 
                 _context = !_options.InIsolation
                     ? _directoryFactory.PrepareTestFiles(_cppClass)
@@ -84,7 +85,7 @@ namespace MuTest.Cpp.CLI
 
 
                     _cppClass.Mutants.AddRange(
-                        CppMutantOrchestrator.GetDefaultMutants(_options.SourceClass));
+                        CppMutantOrchestrator.GetDefaultMutants(_options.SourceClass, _options.SpecificLines));
 
                     if (_cppClass.CoveredLineNumbers.Any())
                     {
@@ -194,6 +195,11 @@ namespace MuTest.Cpp.CLI
                 QuietWithSymbols = true
             };
 
+            if (!_options.IncludeBuildEvents)
+            {
+                string.Format(_context.TestProject.FullName, 0).RemoveBuildEvents();
+            }
+
             testCodeBuild.OutputDataReceived += OutputData;
 
             await testCodeBuild.ExecuteBuild();
@@ -237,7 +243,10 @@ namespace MuTest.Cpp.CLI
             _chalk.Default("\nExecuting Tests...");
             var log = new StringBuilder();
             void OutputData(object sender, string args) => log.AppendLine(args);
-            var testExecutor = new GoogleTestExecutor();
+            var testExecutor = new GoogleTestExecutor
+            {
+                LogDir = MuTestSettings.TestsResultDirectory
+            };
 
             testExecutor.OutputDataReceived += OutputData;
             var projectDirectory = Path.GetDirectoryName(_options.TestProject);
@@ -259,6 +268,24 @@ namespace MuTest.Cpp.CLI
             var cppTestContext = _context.TestContexts.First();
             var filter = $"{Path.GetFileNameWithoutExtension(cppTestContext.TestClass.Name)}*";
             await testExecutor.ExecuteTests(app, filter);
+
+            if (testExecutor.TestResult != null)
+            {
+                _cppClass.NumberOfTests = Convert.ToInt32(testExecutor.TestResult.Tests);
+                _cppClass.NumberOfDisabledTests = Convert.ToInt32(testExecutor.TestResult.Disabled);
+
+                _chalk.Default($"\n\nNumber of Tests: {_cppClass.NumberOfTests}\n");
+
+                _cppClass.Tests.AddRange(testExecutor
+                    .TestResult
+                    .Testsuite
+                    .SelectMany(x => x.Testcase)
+                    .Select(x => new Test
+                    {
+                        Name = $"{x.Classname.Replace("_mutest_test_0", string.Empty)}.{x.Name}",
+                        ExecutionTime = Convert.ToDouble(x.Time)
+                    }));
+            }
 
             if (testExecutor.LastTestExecutionStatus != TestExecutionStatus.Success)
             {

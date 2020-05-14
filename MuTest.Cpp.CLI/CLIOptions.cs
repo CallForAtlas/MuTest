@@ -118,5 +118,22 @@ namespace MuTest.Cpp.CLI
             DefaultValue = DefaultOptions.DisableBuildOptimization,
             ValueType = CommandOptionType.NoValue
         };
+
+        public static readonly CliOption<bool> IncludeBuildEvents = new CliOption<bool>
+        {
+            ArgumentName = "--include-build-events",
+            ArgumentShortName = "-be",
+            ArgumentDescription = "Include project pre, prelink and post build events",
+            DefaultValue = DefaultOptions.IncludeBuildEvents,
+            ValueType = CommandOptionType.NoValue
+        };
+
+        public static readonly CliOption<string> SpecificLineRange = new CliOption<string>
+        {
+            ArgumentName = "--specific_line_range",
+            ArgumentShortName = "-slr <range>",
+            DefaultValue = DefaultOptions.SpecificLines,
+            ArgumentDescription = @"Define code line range to run specific mutants For Example: 5:10, 5:5"
+        };
     }
 }
