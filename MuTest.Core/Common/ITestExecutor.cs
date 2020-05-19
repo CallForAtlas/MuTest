@@ -15,6 +15,7 @@ namespace MuTest.Core.Common
         string BaseAddress { get; set; }
 
         bool EnableTimeout { get; set; }
+
         TestRun TestResult { get; }
 
         CoverageDS CodeCoverage { get; }
