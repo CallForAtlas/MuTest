@@ -119,6 +119,20 @@ namespace MuTest.Cpp.CLI.Utility
             }
         }
 
+        public static void DeleteIfExists(this DirectoryInfo directory, string directoryName)
+        {
+            if (directory == null || !directory.Exists)
+            {
+                return;
+            }
+
+            var dirs = directory.GetDirectories($"{directoryName.Trim('/')}*").ToList();
+            foreach (var dir in dirs)
+            {
+                dir.Delete(true);
+            }
+        }
+
         public static void DeleteIfExists(this string path)
         {
             if (string.IsNullOrWhiteSpace(path))
@@ -282,7 +296,7 @@ namespace MuTest.Cpp.CLI.Utility
                 projectXml.AddNewXmlNode(linkIncremental, generateManifest);
 
                 projectXml.SetInnerTextMultipleNodes(warningLevel, turnOffAllwarnings);
-                projectXml.AddNewXmlNode(warningLevel, debugInformationFormat, none);
+                projectXml.AddNewXmlNode(warningLevel, debugInformationFormat, string.Empty);
                 projectXml.AddNewXmlNode(warningLevel, supportJustMyCode);
                 projectXml.AddNewXmlNode(warningLevel, multiProcessorCompilation, trueValue);
                 projectXml.AddNewXmlNode(warningLevel, errorReporting, none);
@@ -393,16 +407,25 @@ namespace MuTest.Cpp.CLI.Utility
 
         public static IEnumerable<ProjectInSolution> GetProjects(this string solutionFile)
         {
+            var projects = new List<ProjectInSolution>();
             if (string.IsNullOrWhiteSpace(solutionFile) || !File.Exists(solutionFile))
             {
-                return new List<ProjectInSolution>();
+                return projects;
             }
 
-            var sol = new FileInfo(solutionFile);
-            var projects = SolutionFile.Parse(sol.FullName)
-                .ProjectsInOrder
-                .Where(x => x.ProjectType == SolutionProjectType.KnownToBeMSBuildFormat ||
-                            x.ProjectType == SolutionProjectType.SolutionFolder).ToList();
+            try
+            {
+                var sol = new FileInfo(solutionFile);
+                projects = SolutionFile.Parse(sol.FullName)
+                    .ProjectsInOrder
+                    .Where(x => x.ProjectType == SolutionProjectType.KnownToBeMSBuildFormat ||
+                                x.ProjectType == SolutionProjectType.SolutionFolder).ToList();
+            }
+            catch (Exception)
+            {
+                Trace.TraceError("Ignoring Invalid Projects");
+            }
+
             return projects;
         }
     }
