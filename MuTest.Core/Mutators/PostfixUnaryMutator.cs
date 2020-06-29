@@ -9,7 +9,7 @@ namespace MuTest.Core.Mutators
     {
         public string Description { get; } = "POSTFIX UNARY [index++, index--]";
 
-        public bool DefaultMutant { get; } = false;
+        public bool DefaultMutant { get; } = true;
 
         private static readonly IReadOnlyDictionary<SyntaxKind, SyntaxKind> UnaryWithOpposite = new Dictionary<SyntaxKind, SyntaxKind>
         {
@@ -28,7 +28,7 @@ namespace MuTest.Core.Mutators
                     OriginalNode = node,
                     ReplacementNode = replacementNode,
                     DisplayName = $"{unaryKind} to {oppositeKind} mutation - {node} replace with {replacementNode}",
-                    Type = MutatorType.Update
+                    Type = MutatorType.Unary
                 };
             }
         }

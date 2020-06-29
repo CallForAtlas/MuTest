@@ -34,20 +34,32 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HtmlAgilityPack, Version=1.11.23.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.11.23\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.11.24.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.24\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.3.5.0\lib\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
+    <Reference Include="Humanizer, Version=2.2.0.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Humanizer.Core.2.2.0\lib\netstandard1.0\Humanizer.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.3.5.0\lib\netstandard2.0\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.1.1.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp.Workspaces, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.Workspaces.3.5.0\lib\netstandard2.0\Microsoft.CodeAnalysis.CSharp.Workspaces.dll</HintPath>
+    <Reference Include="Microsoft.CodeAnalysis, Version=3.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.3.6.0\lib\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.Workspaces, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.Workspaces.Common.3.5.0\lib\netstandard2.0\Microsoft.CodeAnalysis.Workspaces.dll</HintPath>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=3.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.3.6.0\lib\netstandard2.0\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp.Workspaces, Version=3.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.Workspaces.3.6.0\lib\netstandard2.0\Microsoft.CodeAnalysis.CSharp.Workspaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.Workspaces, Version=3.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Workspaces.Common.3.6.0\lib\netstandard2.0\Microsoft.CodeAnalysis.Workspaces.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Coverage.Analysis">
       <HintPath>..\MuTest.UI\libs\Microsoft.VisualStudio.Coverage.Analysis.dll</HintPath>
@@ -143,6 +155,8 @@
     <Compile Include="Common\InspectCode\Rules\DisposableWarning.cs" />
     <Compile Include="Common\InspectCode\Rules\EnumWithoutDefaultValue.cs" />
     <Compile Include="Common\InspectCode\Rules\ExceptionWithoutContext.cs" />
+    <Compile Include="Common\InspectCode\Rules\UnnecessaryTestCase.cs" />
+    <Compile Include="Common\InspectCode\Rules\UnnecessaryTestDataCase.cs" />
     <Compile Include="Common\InspectCode\Rules\FieldAsProtectedOrPublic.cs" />
     <Compile Include="Common\InspectCode\Rules\GeneralReservedException.cs" />
     <Compile Include="Common\InspectCode\Rules\InappropriateUsageOfProperty.cs" />
@@ -206,7 +220,10 @@
     <Compile Include="Mutants\MutantStatus.cs" />
     <Compile Include="Mutants\Mutation.cs" />
     <Compile Include="Mutators\AssignmentStatementMutator.cs" />
-    <Compile Include="Mutators\BinaryExpressionMutator.cs" />
+    <Compile Include="Mutators\ArithmeticOperatorMutator.cs" />
+    <Compile Include="Mutators\LogicalConnectorMutator.cs" />
+    <Compile Include="Mutators\RelationalOperatorMutator.cs" />
+    <Compile Include="Mutators\BitwiseOperatorMutator.cs" />
     <Compile Include="Mutators\BooleanMutator.cs" />
     <Compile Include="Mutators\CheckedMutator.cs" />
     <Compile Include="Mutators\IMutator.cs" />
@@ -219,6 +236,7 @@
     <Compile Include="Mutators\NegateConditionMutator.cs" />
     <Compile Include="Mutators\PostfixUnaryMutator.cs" />
     <Compile Include="Mutators\PrefixUnaryMutator.cs" />
+    <Compile Include="Mutators\StatementBlockMutator.cs" />
     <Compile Include="Mutators\StringMutator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Testing\ChalkHtml.cs" />
@@ -231,7 +249,9 @@
     <Compile Include="Utility\SyntaxTreeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Mutators\Mutators.md" />
     <None Include="packages.config" />
   </ItemGroup>

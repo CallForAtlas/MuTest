@@ -6,8 +6,8 @@ namespace MuTest.Core.Mutators
     {
         [Description("Arithmetic operators")]
         Arithmetic,
-        [Description("Equality operators")]
-        Equality,
+        [Description("Relational operators")]
+        Relational,
         [Description("Boolean literals")]
         Boolean,
         [Description("Logical operators")]
@@ -16,8 +16,6 @@ namespace MuTest.Core.Mutators
         Assignment,
         [Description("Unary operators")]
         Unary,
-        [Description("Update operators")]
-        Update,
         [Description("Checked statements")]
         Checked,
         [Description("Linq methods")]
@@ -27,6 +25,10 @@ namespace MuTest.Core.Mutators
         [Description("String literals")]
         String,
         [Description("Method calls")]
-        MethodCall
+        MethodCall,
+        [Description("Bitwise operators")]
+        Bitwise,
+        [Description("Block Statement")]
+        Block
     }
 }

@@ -9,7 +9,7 @@ namespace MuTest.Core.Mutators
     {
         public string Description { get; } = "PREFIX UNARY [++index, --index]";
 
-        public bool DefaultMutant { get; } = false;
+        public bool DefaultMutant { get; } = true;
 
         private static readonly IReadOnlyDictionary<SyntaxKind, SyntaxKind> UnaryWithOpposite = new Dictionary<SyntaxKind, SyntaxKind>
         {
@@ -36,7 +36,7 @@ namespace MuTest.Core.Mutators
                     OriginalNode = node,
                     ReplacementNode = replacementNode,
                     DisplayName = $"{unaryKind} to {oppositeKind} mutation - {node} replace with {replacementNode}",
-                    Type = unaryKind.ToString().StartsWith("Unary") ? MutatorType.Unary : MutatorType.Update
+                    Type = MutatorType.Unary
                 };
             }
             else if (UnaryToInitial.Contains(unaryKind))
@@ -47,7 +47,7 @@ namespace MuTest.Core.Mutators
                     OriginalNode = node,
                     ReplacementNode = replacementNode,
                     DisplayName = $"{unaryKind} to un-{unaryKind} mutation - {node} replace with {replacementNode}",
-                    Type = unaryKind.ToString().StartsWith("Logic") ? MutatorType.Boolean : MutatorType.Unary
+                    Type = MutatorType.Unary 
                 };
             }
         }

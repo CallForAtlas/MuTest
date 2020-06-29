@@ -196,11 +196,12 @@ namespace MuTest.Core.Common
 
             await mutantAnalyzer.InitializeMutants(new List<object>
             {
-                new AssignmentStatementMutator(),
-                new BinaryExpressionMutator(),
-                new StringMutator(),
-                new MethodCallMutator(),
-                new InterpolatedStringMutator()
+                new ArithmeticOperatorMutator(),
+                new RelationalOperatorMutator(),
+                new LogicalConnectorMutator(),
+                new StatementBlockMutator(),
+                new PostfixUnaryMutator(),
+                new PrefixUnaryMutator()
             });
         }
 

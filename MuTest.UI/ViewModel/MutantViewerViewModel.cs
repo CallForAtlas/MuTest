@@ -145,17 +145,21 @@ namespace Dashboard.ViewModel
         {
             var mutators = new List<IMutator>
             {
-                new BinaryExpressionMutator(),
+                new ArithmeticOperatorMutator(),
+                new RelationalOperatorMutator(),
+                new LogicalConnectorMutator(),
+                new StatementBlockMutator(),
+                new PostfixUnaryMutator(),
+                new PrefixUnaryMutator(),
                 new AssignmentStatementMutator(),
                 new StringMutator(),
                 new InterpolatedStringMutator(),
                 new MethodCallMutator(),
+                new BitwiseOperatorMutator(),
                 new NonVoidMethodCallMutator(),
                 new LinqMutator(),
                 new BooleanMutator(),
-                new NegateConditionMutator(),
-                new PostfixUnaryMutator(),
-                new PrefixUnaryMutator()
+                new NegateConditionMutator()
             };
 
             SelectedMutators.Clear();

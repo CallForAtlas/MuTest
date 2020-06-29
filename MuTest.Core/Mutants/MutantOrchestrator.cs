@@ -29,7 +29,11 @@ namespace MuTest.Core.Mutants
             Mutators = mutators ?? new List<IMutator>
             {
                 new AssignmentStatementMutator(),
-                new BinaryExpressionMutator(),
+                new ArithmeticOperatorMutator(),
+                new RelationalOperatorMutator(),
+                new LogicalConnectorMutator(),
+                new StatementBlockMutator(),
+                new BitwiseOperatorMutator(),
                 new BooleanMutator(),
                 new CheckedMutator(),
                 new InterpolatedStringMutator(),
@@ -48,11 +52,12 @@ namespace MuTest.Core.Mutants
         {
             var orchestrator = new MutantOrchestrator(new List<IMutator>
             {
-                new AssignmentStatementMutator(),
-                new BinaryExpressionMutator(),
-                new InterpolatedStringMutator(),
-                new StringMutator(),
-                new MethodCallMutator()
+                new ArithmeticOperatorMutator(),
+                new LogicalConnectorMutator(),
+                new RelationalOperatorMutator(),
+                new StatementBlockMutator(),
+                new PrefixUnaryMutator(),
+                new PostfixUnaryMutator()
             });
 
             orchestrator.Mutate(node);
@@ -84,6 +89,16 @@ namespace MuTest.Core.Mutants
 
         public SyntaxNode Mutate(SyntaxNode currentNode)
         {
+            if (currentNode is MethodDeclarationSyntax ||
+                currentNode is ConstructorDeclarationSyntax ||
+                currentNode is PropertyDeclarationSyntax)
+            {
+                foreach (var blockNode in currentNode.DescendantNodes<BlockSyntax>())
+                {
+                    AddBlockMutants(blockNode);
+                }
+            }
+
             if (GetExpressionSyntax(currentNode) is var expressionSyntax && expressionSyntax != null)
             {
                 if (currentNode is ExpressionStatementSyntax syntax)
@@ -135,7 +150,7 @@ namespace MuTest.Core.Mutants
                     }
                     catch (Exception e)
                     {
-                         Trace.TraceError("unable to process if statement at line {0} {1}", ifStatement?.Statement?.LineNumber() + 1 , e);
+                        Trace.TraceError("unable to process if statement at line {0} {1}", ifStatement?.Statement?.LineNumber() + 1, e);
                     }
                 }
 
@@ -160,7 +175,38 @@ namespace MuTest.Core.Mutants
             return currentNode;
         }
 
+        private void AddBlockMutants(SyntaxNode currentNode)
+        {
+            if (currentNode is StatementSyntax block && currentNode.Kind() == SyntaxKind.Block)
+            {
+                var mutant = FindMutantsWithoutChild(block).FirstOrDefault();
+                if (mutant != null)
+                {
+                    Mutants.Add(mutant);
+                }
+            }
+        }
+
         private IEnumerable<Mutant> FindMutants(SyntaxNode current)
+        {
+            foreach (var mutator in Mutators)
+            {
+                if (!(mutator is StatementBlockMutator))
+                {
+                    foreach (var mutation in ApplyMutator(current, mutator))
+                    {
+                        yield return mutation;
+                    }
+                }
+            }
+
+            foreach (var mutant in current.ChildNodes().SelectMany(FindMutants))
+            {
+                yield return mutant;
+            }
+        }
+
+        private IEnumerable<Mutant> FindMutantsWithoutChild(SyntaxNode current)
         {
             foreach (var mutator in Mutators)
             {
@@ -168,11 +214,6 @@ namespace MuTest.Core.Mutants
                 {
                     yield return mutation;
                 }
-            }
-
-            foreach (var mutant in current.ChildNodes().SelectMany(FindMutants))
-            {
-                yield return mutant;
             }
         }
 
@@ -203,7 +244,7 @@ namespace MuTest.Core.Mutants
             var mutations = mutator.Mutate(syntaxNode);
             foreach (var mutation in mutations)
             {
-                yield return new Mutant()
+                yield return new Mutant
                 {
                     Id = MutantCount++,
                     Mutation = mutation,
