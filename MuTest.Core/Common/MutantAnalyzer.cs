@@ -237,9 +237,15 @@ namespace MuTest.Core.Common
                 EnableLogging = true
             };
             testExecutor.OutputDataReceived += OutputData;
+            testExecutor.BeforeTestExecuted += (sender, args) =>
+            {
+                _chalk.Yellow($"\nRunning VSTest.Console with {args}\n");
+            };
 
             await testExecutor.ExecuteTests(source.TestClaz.MethodDetails.ToList());
             source.NumberOfTests = Convert.ToInt32(testExecutor.TestResult?.ResultSummary?.Counters?.Total);
+
+            _chalk.Yellow($"\nNumber of Tests: {source.NumberOfTests}\n");
 
             if (testExecutor.LastTestExecutionStatus != Constants.TestExecutionStatus.Success)
             {
@@ -256,7 +262,14 @@ namespace MuTest.Core.Common
                     coverage.FindCoverage(source, testExecutor.CodeCoverage);
                 }
 
-                _chalk.Green("\nCode Coverage is Loaded!\n");
+                if (source.Coverage != null)
+                {
+
+                    var coveredLines = source.Coverage.LinesCovered;
+                    var totalLines = source.Coverage.TotalLines;
+                    _chalk.Yellow(
+                        $"\nCode Coverage for Class {Path.GetFileName(source.FilePath)} is {decimal.Divide(coveredLines, totalLines):P} ({coveredLines}/{totalLines})\n");
+                }
             }
 
             testExecutor.OutputDataReceived -= OutputData;
