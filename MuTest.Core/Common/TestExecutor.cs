@@ -63,6 +63,7 @@ namespace MuTest.Core.Common
         public event EventHandler<string> OutputDataReceived;
 
         public event EventHandler<string> BeforeTestExecuted;
+
         public TestExecutor(MuTestSettings settings, string testClassLibrary)
         {
             if (string.IsNullOrWhiteSpace(testClassLibrary))
