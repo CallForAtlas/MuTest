@@ -31,6 +31,13 @@ namespace MuTest.Core.Mutators
             var returnType = method?.ReturnType?.ToString() ?? property?.Type?.ToString();
             var randomValue = returnType?.GetRandomValue();
 
+            var yieldField = false;
+            if (method != null && method.DescendantNodes<YieldStatementSyntax>().Any())
+            {
+                yieldField = true;
+                randomValue = "yield break";
+            }
+
             if (!string.IsNullOrWhiteSpace(returnType) && returnType != "void")
             {
                 if (node.DescendantNodes<ReturnStatementSyntax>().Any() ||
@@ -54,7 +61,7 @@ namespace MuTest.Core.Mutators
                     }
                 }
 
-                replacementNode = SyntaxFactory.ParseStatement($"{{ return {randomValue}; }}");
+                replacementNode = SyntaxFactory.ParseStatement(!yieldField ? $"{{ return {randomValue}; }}" : $"{{ {randomValue}; }}");
             }
 
             yield return new Mutation

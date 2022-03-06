@@ -286,8 +286,32 @@ namespace MuTest.Core.Utility
                     return "Guid.NewGuid()";
                 case "bool":
                     return "false";
+                case "Task":
+                    return string.Empty;
                 default:
-                    return dataType.StartsWith("Task") ? "null" : $"({dataType})new object()";
+                    if (dataType.StartsWith("Task"))
+                    {
+                        return "null";
+                    }
+                    else if(dataType.StartsWith("IList<") || 
+                            dataType.StartsWith("List<") || 
+                            dataType.StartsWith("IReadOnlyList<") || 
+                            dataType.StartsWith("IEnumerable<") || 
+                            dataType.StartsWith("IReadOnlyCollection<") || 
+                            dataType.StartsWith("ICollection<"))
+                    {
+                        return $"new List{dataType.Substring(dataType.IndexOf('<'))}()";
+                    }
+                    else if (dataType.StartsWith("IDictionary<") ||
+                             dataType.StartsWith("Dictionary<") ||
+                             dataType.StartsWith("IReadOnlyDictionary<"))
+                    {
+                        return $"new Dictionary{dataType.Substring(dataType.IndexOf('<'))}()";
+                    }
+                    else
+                    {
+                        return $"({dataType})new object()";
+                    }
             }
         }
 

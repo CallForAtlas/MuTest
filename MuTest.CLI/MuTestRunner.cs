@@ -8,7 +8,6 @@ using MuTest.Api.Clients.ServiceClients;
 using MuTest.Console.Model;
 using MuTest.Console.Options;
 using MuTest.Core.Common;
-using MuTest.Core.Common.ClassDeclarationLoaders;
 using MuTest.Core.Common.Settings;
 using MuTest.Core.Exceptions;
 using MuTest.Core.Model;
@@ -208,10 +207,10 @@ namespace MuTest.Console
                 }
                 finally
                 {
-                    MutantExecutor = mutantAnalyzer.MutantExecutor ?? new MutantExecutor(_source, MuTestSettings);
                     _stopwatch.Stop();
                     if (_source != null)
                     {
+                        MutantExecutor = mutantAnalyzer.MutantExecutor ?? new MutantExecutor(_source, MuTestSettings);
                         await GenerateReports();
 
                         if (!string.IsNullOrWhiteSpace(_options.ProcessWholeProject))

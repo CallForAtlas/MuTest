@@ -531,11 +531,11 @@ namespace Dashboard.ViewModel
                     build.OutputDataReceived += BuildOutputData;
                     if (!ChkInReleaseMode.IsChecked)
                     {
-                        await build.ExecuteBuildInDebugModeWithoutDependencies();
+                        await build.ExecuteBuildInDebugModeWithDependencies();
                     }
                     else
                     {
-                        await build.ExecuteBuildInReleaseModeWithoutDependencies();
+                        await build.ExecuteBuildInReleaseModeWithDependencies();
                     }
 
                     if (build.LastBuildStatus == BuildExecutionStatus.Failed)
@@ -780,7 +780,8 @@ namespace Dashboard.ViewModel
                                             x.Value.LastIndexOf("(", StringComparison.InvariantCultureIgnoreCase) + 1;
                                         var endIndex = x.Value.LastIndexOf(")",
                                             StringComparison.InvariantCultureIgnoreCase);
-                                        return Convert.ToInt32(x.Value.Substring(startIndex, endIndex - startIndex));
+                                        int.TryParse(x.Value.Substring(startIndex, endIndex - startIndex), out var result);
+                                        return result;
                                     }).Min();
 
                                     assertValue = $"{left}.ShouldBeGreaterThanOrEqualTo({min}),";

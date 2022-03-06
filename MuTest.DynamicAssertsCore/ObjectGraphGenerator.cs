@@ -234,6 +234,7 @@ namespace MuTest.DynamicAsserts
                    !fullName.Contains("RequiredFieldValidator") &&
                    !fieldInfo.Name.Contains("__BackingField") &&
                    !fieldInfo.Name.StartsWith("__") &&
+                   !fieldInfo.Name.StartsWith("Mock<") &&
                    !fieldInfo.IsLiteral &&
                    !fieldInfo.IsInitOnly;
         }
@@ -251,6 +252,7 @@ namespace MuTest.DynamicAsserts
                    !fullName.Contains("DropDownList") &&
                    !fullName.Contains("CultureInfo") &&
                    !property.Name.StartsWith("__") &&
+                   !property.Name.StartsWith("Mock<") &&
                    property.CanRead &&
                    !fullName.Contains("RequiredFieldValidator");
         }

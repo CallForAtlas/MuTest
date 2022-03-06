@@ -123,7 +123,8 @@ namespace MuTest.Core.Utility
                 if (targetPlatform != null)
                 {
                     return targetPlatform.InnerText.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase) ||
-                            targetPlatform.InnerText.StartsWith("net5.0", StringComparison.InvariantCultureIgnoreCase);
+                            targetPlatform.InnerText.StartsWith("net5.0", StringComparison.InvariantCultureIgnoreCase) ||
+                            targetPlatform.InnerText.StartsWith("net6.0", StringComparison.InvariantCultureIgnoreCase);
 
                 }
             }
